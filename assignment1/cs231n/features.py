@@ -119,7 +119,7 @@ def hog_feature(im):
     temp_mag = np.where(cond2, grad_mag, 0)
     orientation_histogram[:,:,i] = uniform_filter(temp_mag, size=(cx, cy))[int(cx/2)::cx, int(cy/2)::cy].T
   
-  return orientation_histogram.ravel()
+  return orientation_histogram.ravel(),orientation_histogram
 
 
 def color_histogram_hsv(im, nbin=10, xmin=0, xmax=255, normalized=True):
