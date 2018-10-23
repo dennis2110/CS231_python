@@ -67,7 +67,7 @@ class TwoLayerNet(object):
     W1, b1 = self.params['W1'], self.params['b1']
     W2, b2 = self.params['W2'], self.params['b2']
     N, D = X.shape
-
+    H, C = W2.shape
     # Compute the forward pass
     scores = None
     #############################################################################
@@ -76,6 +76,9 @@ class TwoLayerNet(object):
     # shape (N, C).                                                             #
     #############################################################################
     pass
+    X_W1 = X.dot(W1)+b1
+    max_X_W1 = np.maximum(0,X_W1)  
+    scores = max_X_W1.dot(W2)+ b2
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -93,6 +96,9 @@ class TwoLayerNet(object):
     # classifier loss.                                                          #
     #############################################################################
     pass
+    shift_scores = scores - np.max(scores, axis=1).reshape(-1,1)
+    loss_is = -shift_scores[range(N),y] + np.log(np.sum(np.exp(shift_scores),axis=1))
+    loss = np.sum(loss_is)/N + reg * np.sum(W1*W1) + reg * np.sum(W2*W2)
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -105,6 +111,18 @@ class TwoLayerNet(object):
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
     pass
+    dscores = np.zeros([N,C])
+    dscores[range(N),y] = -1
+    dscores += np.exp(shift_scores)/np.sum(np.exp(shift_scores),axis=1).reshape(-1,1) 
+    dscores /= N
+    #dW = X.T.dot(dscores) + 2*reg*W
+    db2 = np.sum(dscores,axis=0)
+    dW2 = max_X_W1.T.dot(dscores) + 2*reg*W2
+    dS0 = dscores.dot(W2.T)
+    dS0[max_X_W1==0] = 0
+    db1 = np.sum(dS0,axis=0)
+    dW1 = X.T.dot(dS0) + 2*reg*W1
+    grads = {'W1':dW1,'W2':dW2,'b1':db1,'b2':db2}
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -149,6 +167,9 @@ class TwoLayerNet(object):
       # them in X_batch and y_batch respectively.                             #
       #########################################################################
       pass
+      random_img = np.random.choice(num_train, batch_size, replace=True)
+      X_batch = X[random_img,:]
+      y_batch = y[random_img]
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
@@ -164,6 +185,10 @@ class TwoLayerNet(object):
       # stored in the grads dictionary defined above.                         #
       #########################################################################
       pass
+      self.params['W1'] += - learning_rate * grads['W1'] 
+      self.params['b1'] += - learning_rate * grads['b1']
+      self.params['W2'] += - learning_rate * grads['W2']
+      self.params['b2'] += - learning_rate * grads['b2']
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
@@ -209,6 +234,8 @@ class TwoLayerNet(object):
     # TODO: Implement this function; it should be VERY simple!                #
     ###########################################################################
     pass
+    scores = self.loss(X)
+    y_pred = np.argmax(scores,axis=1)
     ###########################################################################
     #                              END OF YOUR CODE                           #
     ###########################################################################
