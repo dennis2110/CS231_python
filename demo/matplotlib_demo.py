@@ -8,7 +8,7 @@ Matplotlib demo
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.misc import imread, imresize
-
+'''
 # Compute the x and y coordinates for points on a sine curve
 x = np.arange(0, 3 * np.pi, 0.1)
 y = np.sin(x)
@@ -63,4 +63,15 @@ plt.subplot(1, 2, 2)
 # if presented with data that is not uint8. To work around this, we
 # explicitly cast the image to uint8 before displaying it.
 plt.imshow(np.uint8(img_tinted))
+plt.show()
+'''
+x = np.arange(-10, 10, 0.1)
+y = 1/(1+np.exp(-x))
+y2= y*(1-y)
+plt.plot(x, y)
+plt.title('sigmoid')
+plt.show()
+
+plt.plot(x, y2)
+plt.title('sigmoid_gradient')
 plt.show()
